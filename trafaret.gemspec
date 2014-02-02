@@ -9,7 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Mikhail Krivushin"]
   spec.email         = ["krivushinme@gmail.com"]
   spec.summary       = %q{Convert data structures. Like a RABL.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.description   = %q{The thing to convert entities from one to other.
+                          Idea from Python Trafaret lib in Ruby way.}
   spec.homepage      = ""
   spec.license       = "MIT"
 
