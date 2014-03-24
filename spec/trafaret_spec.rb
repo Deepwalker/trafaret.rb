@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
 require 'trafaret'
 
-describe Trafaret do
-  Provider = Trafaret::Hash.new do
-    attribute :url
-  end
+class ProviderTrafaret < Trafaret::Base
+  key :url, Trafaret::String, min_length: 3, max_length: 50
+end
 
-  Checker = Trafaret::Hash.new do
-    attribute :name
-    array :providers, class: Provider do |obj|
-      obj['oa'].flat_map do |prov_name, accs|
-        accs.map {|uuid, data| data}
-      end
+class FacebookResponseTrafaret < Trafaret::Base
+  key :name, :string, optional: true, min_length: 5
+  extract :providers do |data|
+    data['oa'].flat_map do |prov_name, accs|
+      accs.map { |uuid, data| data }
     end
   end
+  key :providers, :array, validator: :provider_trafaret
+end
 
+describe Trafaret::Base do
   let :raw do
     {'name' => 'kuku',
      'oa' => {
@@ -26,6 +27,6 @@ describe Trafaret do
     }
   end
   it 'should work' do
-    Checker.dump(raw).should == ({"name"=>"kuku", "providers"=>[{"url"=>"http://ya.ru"}, {"url"=>"http://www.ru"}]})
+    FacebookResponseTrafaret.new.call(raw).should == ({name: "kuku", providers: [{url: "http://ya.ru"}, {url: "http://www.ru"}]})
   end
 end
