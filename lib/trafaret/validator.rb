@@ -23,6 +23,11 @@ class Trafaret::Validator
 
   # ADT
   def |(other)
-    Trafaret::Or(self, other)
+    Trafaret::Or.new(self, other)
+  end
+
+  # Helpers
+  def failure(msg)
+    Trafaret::Error.new msg
   end
 end
