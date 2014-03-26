@@ -1,10 +1,15 @@
 class Trafaret::Validator
-  def initialize(options = {})
+  def initialize(options = {}, &blk)
     @options = options
+    @blk = blk
   end
 
   def validate(data)
-    data # or return Trafaret::Error
+    if @blk
+      @blk.call(data)
+    else
+      data # or return Trafaret::Error
+    end
   end
 
   def convert(data)

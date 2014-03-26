@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 require 'trafaret'
 
+T = Trafaret
+
 class ProviderTrafaret < Trafaret::Base
-  key :url, Trafaret::String, min_length: 3, max_length: 50
+  key :url, T.string(min_length: 3, max_length: 50)
 end
 
 class FacebookResponseTrafaret < Trafaret::Base
-  key :name, :string, optional: true, min_length: 2
+  key :name, T.string(min_length: 2), optional: true
   extract :providers do |data|
     data['oa'].flat_map do |prov_name, accs|
       accs.map { |uuid, data| data }
@@ -33,29 +35,52 @@ end
 
 describe Trafaret::String do
   it 'should check errors' do
-    Trafaret.string.call('').message.should == 'Should not be blank'
-    Trafaret.string(min_length: 10).call('abc').message.should == 'Too short'
-    Trafaret.string(max_length: 1).call('abc').message.should == 'Too long'
-    Trafaret.string(regex: /abc/).call('bca').message.should == 'Does not match'
+    T.string.call('').message.should == 'Should not be blank'
+    T.string(min_length: 10).call('abc').message.should == 'Too short'
+    T.string(max_length: 1).call('abc').message.should == 'Too long'
+    T.string(regex: /abc/).call('bca').message.should == 'Does not match'
+  end
+end
+
+describe Trafaret::Integer do
+  it 'should check errors' do
+    T.integer.call('blabla').message.should == 'Not an Integer'
+    T.integer(lt: 5).call(5).message.should == 'Too big'
+    T.integer(lte: 5).call(6).message.should == 'Too big'
+    T.integer(gt: 5).call(5).message.should == 'Too small'
+    T.integer(gte: 5).call(4).message.should == 'Too small'
+  end
+end
+
+describe Trafaret::Validator do
+  it 'should work with block' do
+    blk = proc { |data| if data.present? then data else T::Error.new('Empty data') end }
+    T::Validator.new(&blk).call('argh').should == 'argh'
+    T::Validator.new(&blk).call('').message.should == 'Empty data'
+    T.proc(&blk).call('').message.should == 'Empty data'
   end
 end
 
 describe Trafaret::Array do
   it 'should check' do
-    Trafaret::Array[:string].call(['a', 'b', 'c']).should == ['a', 'b', 'c']
+    T::Array[:string].call(['a', 'b', 'c']).should == ['a', 'b', 'c']
   end
 end
 
 describe Trafaret::Or do
   it 'should return value' do
-    Trafaret[:or, [:string, :integer]].call('krukatuka').should == 'krukatuka'
+    T[:or, [:string, :integer]].call('krukatuka').should == 'krukatuka'
 
-    (Trafaret[:string] | Trafaret[:integer]).call('krukatuka').should == 'krukatuka'
+    (T[:string] | T[:integer]).call('krukatuka').should == 'krukatuka'
 
-    (Trafaret.string | Trafaret.integer).call('krukatuka').should == 'krukatuka'
+    (T.string | T.integer).call('krukatuka').should == 'krukatuka'
   end
 
   it 'should return errors' do
-    Trafaret[:or, Trafaret[:array, validator: :string]].call('krukatuka').message.first.message.should == 'Not an Array'
+    T[:or, T[:array, validator: :string]].call('krukatuka').message.first.message.should == 'Not an Array'
+  end
+
+  it 'should properly chained' do
+    (T.string(min_length: 100) | T.integer | T.string(regex: /aaa/)).call('aaa').should == 'aaa'
   end
 end

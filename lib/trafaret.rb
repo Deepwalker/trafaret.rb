@@ -34,4 +34,8 @@ module Trafaret
       super
     end
   end
+
+  def self.proc(*args, &blk)
+    Trafaret::Validator.new *args, &blk
+  end
 end

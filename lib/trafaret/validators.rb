@@ -41,11 +41,25 @@ module Trafaret
       end
       data
     end
+
+    def convert(data)
+      if data.is_a? MatchData
+        data.string
+      else
+        data
+      end
+    end
   end
 
   class Integer < Validator
     def validate(data)
-      data.to_i
+      val = Integer(data) rescue nil
+      return failure('Not an Integer') unless val
+      return failure('Too big') if @options[:lt] && val >= @options[:lt]
+      return failure('Too big') if @options[:lte] && val > @options[:lte]
+      return failure('Too small') if @options[:gt] && val <= @options[:gt]
+      return failure('Too small') if @options[:gte] && val < @options[:gte]
+      data
     end
   end
 

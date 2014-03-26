@@ -2,7 +2,7 @@ module Trafaret
   class Key
     def initialize(name, validator, options = {}, &blk)
       @name = name
-      @validator = validator.new(options)
+      @validator = if validator.is_a?(Class) then validator.new(options) else validator end
       @options = options
       @blk = blk
     end
