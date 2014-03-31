@@ -84,3 +84,13 @@ describe Trafaret::Or do
     (T.string(min_length: 100) | T.integer | T.string(regex: /aaa/)).call('aaa').should == 'aaa'
   end
 end
+
+describe Trafaret::Chain do
+  it 'should work with callables' do
+    trafaret = T.integer & proc { |d| d == 123? d : Trafaret::Error.new('not equal') }
+    trafaret.call(123).should == 123
+    trafaret.call(321).message.should == 'not equal'
+    trafaret = T.chain & T.integer & proc { |d| d }
+    trafaret.call('abc').message.should == 'Not an Integer'
+  end
+end

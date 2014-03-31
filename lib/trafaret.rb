@@ -3,6 +3,7 @@ require 'trafaret/version'
 require 'trafaret/errors'
 require 'trafaret/validator'
 require 'trafaret/validators'
+require 'trafaret/numeric'
 require 'trafaret/base'
 
 module Trafaret

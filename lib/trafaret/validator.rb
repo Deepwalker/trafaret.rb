@@ -1,6 +1,7 @@
 class Trafaret::Validator
-  def initialize(options = {}, &blk)
-    @options = options
+  def initialize(*args, &blk)
+    @options = (args.pop if args.last.is_a? Hash) || {}
+    @args = args
     @blk = blk
   end
 
@@ -29,6 +30,10 @@ class Trafaret::Validator
   # ADT
   def |(other)
     Trafaret::Or.new(self, other)
+  end
+
+  def &(other)
+    Trafaret::Chain.new(self, other)
   end
 
   # Helpers

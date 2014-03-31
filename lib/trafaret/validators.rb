@@ -2,14 +2,16 @@ module Trafaret
   class Any < Validator
   end
 
-  class Or < Validator
+  class ADT < Validator
     attr_reader :validators
 
     def initialize(*args)
       args = args.first if args.first.is_a? ::Array
       @validators = args.map { |v| Trafaret.get_instantiated_validator(v) }
     end
+  end
 
+  class Or < ADT
     def validate(data)
       errors = []
       @validators.each do |v|
@@ -25,6 +27,20 @@ module Trafaret
 
     def |(other)
       Trafaret::Or.new(*validators, other)
+    end
+  end
+
+  class Chain < ADT
+    def validate(data)
+      @validators.each do |v|
+        data = v.call(data)
+        return data if data.is_a? Trafaret::Error
+      end
+      data
+    end
+
+    def &(other)
+      Trafaret::Chain.new(*validators, other)
     end
   end
 
@@ -48,18 +64,6 @@ module Trafaret
       else
         data
       end
-    end
-  end
-
-  class Integer < Validator
-    def validate(data)
-      val = Integer(data) rescue nil
-      return failure('Not an Integer') unless val
-      return failure('Too big') if @options[:lt] && val >= @options[:lt]
-      return failure('Too big') if @options[:lte] && val > @options[:lte]
-      return failure('Too small') if @options[:gt] && val <= @options[:gt]
-      return failure('Too small') if @options[:gte] && val < @options[:gte]
-      data
     end
   end
 
