@@ -24,6 +24,8 @@ module Trafaret
                rescue NoMethodError, TypeError
                  nil
                end
+      data ||= @options[:default] if @options[:default]
+      data
     end
 
     def call(data, extractors = {})
@@ -59,12 +61,28 @@ module Trafaret
     end
     extend ClassMethods
 
+    def prepare
+      @keys = []
+      @keys.concat self.class.keys
+      @extractors = self.class.extractors
+    end
+
     def validate(data)
       res = []
-      self.class.keys.each do |key|
-        res << key.call(data, extractors = self.class.extractors)
+      fails = []
+      @keys.each do |key|
+        vdata = key.call(data, extractors = @extractors)
+        if vdata[1].is_a? Trafaret::Error
+          fails << vdata
+        else
+          res << vdata
+        end
       end
-      Hash[res]
+      unless fails.blank?
+        Trafaret::Error.new Hash[fails]
+      else
+        Hash[res]
+      end
     end
   end
 end

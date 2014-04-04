@@ -5,5 +5,9 @@ module Trafaret
     def initialize(message)
       @message = message
     end
+
+    def inspect
+      "#<Trafaret::Error(#{message.inspect})>"
+    end
   end
 end

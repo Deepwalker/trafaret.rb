@@ -3,6 +3,11 @@ class Trafaret::Validator
     @options = (args.pop if args.last.is_a? Hash) || {}
     @args = args
     @blk = blk
+
+    prepare
+  end
+
+  def prepare
   end
 
   def validate(data)

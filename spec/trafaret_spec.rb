@@ -14,7 +14,8 @@ class FacebookResponseTrafaret < Trafaret::Base
       accs.map { |uuid, data| data }
     end
   end
-  key :providers, :array, validator: :provider_trafaret
+  key :providers, T::Array[:provider_trafaret]
+  key :dwarf, :string, default: 'Sniffer'
 end
 
 describe Trafaret::Base do
@@ -29,7 +30,7 @@ describe Trafaret::Base do
     }
   end
   it 'should work' do
-    FacebookResponseTrafaret.new.call(raw).should == ({name: "kuku", providers: [{url: "http://ya.ru"}, {url: "http://www.ru"}]})
+    FacebookResponseTrafaret.new.call(raw).should == ({name: "kuku", providers: [{url: "http://ya.ru"}, {url: "http://www.ru"}], dwarf: 'Sniffer'})
   end
 end
 
@@ -90,7 +91,19 @@ describe Trafaret::Chain do
     trafaret = T.integer & proc { |d| d == 123? d : Trafaret::Error.new('not equal') }
     trafaret.call(123).should == 123
     trafaret.call(321).message.should == 'not equal'
-    trafaret = T.chain & T.integer & proc { |d| d }
+    trafaret = T.integer & proc { |d| d }
     trafaret.call('abc').message.should == 'Not an Integer'
   end
 end
+
+
+# describe Trafaret::Base do
+#   Trafaret::Hash.new(:first_name, :second_name, age: T.integer(17..190))
+
+
+#   T.string(:first_name) ~ T.string(:last_name) ~ T.integer(:age, 17..190)
+#   T::Hash(first_name: T.String, last_name: T.string, age: T.integer(17..990))
+
+
+
+# end
