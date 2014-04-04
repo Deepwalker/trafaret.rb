@@ -1,10 +1,13 @@
 module Trafaret
   class Key
     def initialize(name, validator, options = {}, &blk)
+      validator = Trafaret.get_validator(validator)
       @name = name
       @validator = if validator.is_a?(Class) then validator.new(options) else validator end
       @options = options
       @blk = blk
+      @optional = options[:optional]
+      @default = options[:default]
     end
 
     def get(obj, extractors = {})
@@ -24,15 +27,19 @@ module Trafaret
                rescue NoMethodError, TypeError
                  nil
                end
-      data ||= @options[:default] if @options[:default]
+      data ||= @default if @default
       data
     end
 
     def call(data, extractors = {})
-      [@name, @validator.call(get(data, extractors), &@blk)]
+      value = get(data, extractors)
+      return unless value || !@optional
+      value = @validator.call(value, &@blk)
+      [@name, value]
     end
   end
 
+  # dont know if extractors are really usefull thing
   class Extractor
     def initialize(&blk)
       @blk = blk
@@ -52,7 +59,7 @@ module Trafaret
       end
 
       def key(name, validator, options = {}, &blk)
-        @keys << Key.new(name, Trafaret.get_validator(validator), options, &blk)
+        @keys << Key.new(name, validator, options, &blk)
       end
 
       def extract(name, &blk)
@@ -60,6 +67,8 @@ module Trafaret
       end
     end
     extend ClassMethods
+
+    attr_accessor :keys, :extractors
 
     def prepare
       @keys = []
@@ -72,16 +81,17 @@ module Trafaret
       fails = []
       @keys.each do |key|
         vdata = key.call(data, extractors = @extractors)
+        next unless vdata
         if vdata[1].is_a? Trafaret::Error
           fails << vdata
         else
           res << vdata
         end
       end
-      unless fails.blank?
-        Trafaret::Error.new Hash[fails]
-      else
+      if fails.blank?
         Hash[res]
+      else
+        Trafaret::Error.new Hash[fails]
       end
     end
   end

@@ -5,7 +5,7 @@ module Trafaret
     FLOAT = 'Float'.freeze
 
     def try_convert(arg)
-      raise Exception.new 'type method need to be implemented'
+      raise 'type method need to be implemented'
     end
 
     def num_class_name

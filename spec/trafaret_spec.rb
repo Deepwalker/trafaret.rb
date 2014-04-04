@@ -16,6 +16,7 @@ class FacebookResponseTrafaret < Trafaret::Base
   end
   key :providers, T::Array[:provider_trafaret]
   key :dwarf, :string, default: 'Sniffer'
+  key :optional_key, :string, optional: true
 end
 
 describe Trafaret::Base do
@@ -97,13 +98,10 @@ describe Trafaret::Chain do
 end
 
 
-# describe Trafaret::Base do
-#   Trafaret::Hash.new(:first_name, :second_name, age: T.integer(17..190))
-
-
-#   T.string(:first_name) ~ T.string(:last_name) ~ T.integer(:age, 17..190)
-#   T::Hash(first_name: T.String, last_name: T.string, age: T.integer(17..990))
-
-
-
-# end
+describe Trafaret::Key do
+  it 'should extract and check value' do
+    T.key(:name, :string).call({name: 'cow'}).should == [:name, 'cow']
+    T.key(:name, :string, default: 'Elephant').call({}).should == [:name, 'Elephant']
+    T.key(:name, :string, optional: true).call({}).should == nil
+  end
+end
