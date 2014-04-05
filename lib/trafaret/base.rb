@@ -91,7 +91,7 @@ module Trafaret
       if fails.blank?
         Hash[res]
       else
-        Trafaret::Error.new Hash[fails]
+        failure(Hash[fails])
       end
     end
   end

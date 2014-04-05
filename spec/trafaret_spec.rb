@@ -90,7 +90,7 @@ end
 
 describe Trafaret::Chain do
   it 'should work with callables' do
-    trafaret = T.integer & proc { |d| d == 123? d : Trafaret::Error.new('not equal') }
+    trafaret = T.integer & proc { |d| d == 123? d : T.f('not equal') }
     trafaret.call(123).should == 123
     trafaret.call(321).message.should == 'not equal'
     trafaret = T.integer & proc { |d| d }
@@ -104,5 +104,17 @@ describe Trafaret::Key do
     T.key(:name, :string).call({name: 'cow'}).should == [:name, 'cow']
     T.key(:name, :string, default: 'Elephant').call({}).should == [:name, 'Elephant']
     T.key(:name, :string, optional: true).call({}).should == nil
+  end
+end
+
+describe Trafaret::Symbol do
+  it 'should check equality' do
+    T.symbol(:name).call('name').should == :name
+    T.symbol(:name).call(:name).should == :name
+  end
+
+  it 'should fail' do
+    T.symbol(:name).call('pame').message.should == 'Not equal'
+    T.symbol(:name).call(123).message.should == 'Not a String or a Symbol'
   end
 end

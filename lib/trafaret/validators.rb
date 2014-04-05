@@ -67,24 +67,45 @@ module Trafaret
     end
   end
 
+  class Symbol < Validator
+    def prepare
+      @sym = @args.first.to_sym
+      @str = @args.first.to_s.freeze
+    end
+
+    def validate(data)
+      case data
+      when ::String
+        @str == data ? @sym : failure('Not equal')
+      when ::Symbol
+        @sym == data ? @sym : failure('Not equal')
+      else
+        failure('Not a String or a Symbol')
+      end
+    end
+  end
+
   class Array < Validator
+    def prepare
+      @cls = Trafaret.get_validator(@options[:validator]).new @options
+    end
+
     def self.[](validator, options = {})
       self.new(options.merge(validator: validator))
     end
 
     def validate(data)
       return failure('Not an Array') unless data.is_a? ::Array
-      cls = Trafaret.get_validator(@options[:validator]).new @options
       fails = {}
       res = data.map.with_index do |elem, index|
-        val = cls.call elem
+        val = @cls.call elem
         fails[index] = val if val.is_a? Trafaret::Error
         val
       end
       if fails.blank?
         return res
       else
-        return Trafaret::Error.new fails
+        return failure(fails)
       end
     end
   end
