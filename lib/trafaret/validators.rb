@@ -75,8 +75,16 @@ module Trafaret
     def validate(data)
       return failure('Not an Array') unless data.is_a? ::Array
       cls = Trafaret.get_validator(@options[:validator]).new @options
-      data.map do |elem|
-        cls.call elem
+      fails = {}
+      res = data.map.with_index do |elem, index|
+        val = cls.call elem
+        fails[index] = val if val.is_a? Trafaret::Error
+        val
+      end
+      if fails.blank?
+        return res
+      else
+        return Trafaret::Error.new fails
       end
     end
   end

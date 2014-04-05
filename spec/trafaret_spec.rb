@@ -66,6 +66,7 @@ end
 describe Trafaret::Array do
   it 'should check' do
     T::Array[:string].call(['a', 'b', 'c']).should == ['a', 'b', 'c']
+    T::Array[:string].call(['a', 'b', nil]).should.is_a? Trafaret::Error
   end
 end
 
