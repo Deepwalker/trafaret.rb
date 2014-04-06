@@ -3,18 +3,15 @@ require 'trafaret'
 
 T = Trafaret
 
-class ProviderTrafaret < Trafaret::Base
-  key :url, T.string(min_length: 3, max_length: 50)
-end
-
 class FacebookResponseTrafaret < Trafaret::Base
   key :name, T.string(min_length: 2), optional: true
-  extract :providers do |data|
-    data['oa'].flat_map do |prov_name, accs|
-      accs.map { |uuid, data| data }
-    end
+  key :oa, T.mapping(T.string,
+    T.mapping(T.string,
+      T.base(keys: [T.key(:url, T.string)])
+    )
+  ), to_name: :providers do |data| # so we have response that matches our assumptions, then we can convert it
+    data.flat_map { |p_n, accs| accs.map { |uuid, data| data } }
   end
-  key :providers, T::Array[:provider_trafaret]
   key :dwarf, :string, default: 'Sniffer'
   key :optional_key, :string, optional: true
 end

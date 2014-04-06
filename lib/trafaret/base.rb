@@ -4,20 +4,15 @@ module Trafaret
       validator = Trafaret.get_validator(validator)
       @name = name
       @validator = if validator.is_a?(Class) then validator.new(options) else validator end
+      @validator.add(blk) if blk
       @options = options
-      @blk = blk
       @optional = options[:optional]
       @default = options[:default]
+      @to_name = options[:to_name] || name
     end
 
-    def get(obj, extractors = {})
-      return @blk.call obj if @blk
+    def get(obj)
       data = begin
-               extractors[@name].call(obj) if extractors[@name]
-             rescue NoMethodError
-               nil
-             end
-      data ||= begin
                obj.send(@name)
              rescue NameError
                nil
@@ -31,22 +26,11 @@ module Trafaret
       data
     end
 
-    def call(data, extractors = {})
-      value = get(data, extractors)
+    def call(data)
+      value = get(data)
       return unless value || !@optional
       value = @validator.call(value, &@blk)
-      [@name, value]
-    end
-  end
-
-  # dont know if extractors are really usefull thing
-  class Extractor
-    def initialize(&blk)
-      @blk = blk
-    end
-
-    def call(data)
-      @blk.call data
+      [@to_name, value]
     end
   end
 
@@ -62,25 +46,21 @@ module Trafaret
         @keys << Key.new(name, validator, options, &blk)
       end
 
-      def extract(name, &blk)
-        @extractors[name] = Extractor.new(&blk)
-      end
     end
     extend ClassMethods
 
-    attr_accessor :keys, :extractors
+    attr_accessor :keys
 
     def prepare
-      @keys = []
-      @keys.concat self.class.keys
-      @extractors = self.class.extractors
+      @keys = @options[:keys] || []
+      @keys.concat(self.class.keys || [])
     end
 
     def validate(data)
       res = []
       fails = []
       @keys.each do |key|
-        vdata = key.call(data, extractors = @extractors)
+        vdata = key.call(data)
         next unless vdata
         if vdata[1].is_a? Trafaret::Error
           fails << vdata

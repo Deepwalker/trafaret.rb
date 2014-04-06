@@ -109,4 +109,42 @@ module Trafaret
       end
     end
   end
+
+  class Mapping < Validator
+    def prepare
+      @key_validator = @args.first
+      @value_validator = @args[1]
+    end
+
+    def validate(data)
+      return failure('Not a Hash') unless data.is_a? ::Hash
+      fails = []
+      pairs = []
+      data.each do |k, v|
+        kv = @key_validator.call(k)
+        vv = @value_validator.call(v)
+        if (kv.is_a? Trafaret::Error) || (vv.is_a? Trafaret::Error)
+          fails << [k, [kv, vv]]
+        else
+          pairs << [kv, vv]
+        end
+      end
+      if fails.blank?
+        Hash[pairs]
+      else
+        failure(Hash[fails])
+      end
+    end
+  end
+
+  class Proc < Validator
+    def prepare
+      raise 'Need to call with block' if @converters.blank?
+      @blk = @converters.pop
+    end
+
+    def validate(data)
+      @blk.call(data)
+    end
+  end
 end

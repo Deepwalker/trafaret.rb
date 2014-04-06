@@ -2,7 +2,8 @@ class Trafaret::Validator
   def initialize(*args, &blk)
     @options = (args.pop if args.last.is_a? Hash) || {}
     @args = args
-    @blk = blk
+    @converters = []
+    @converters << blk if blk
 
     prepare
   end
@@ -11,15 +12,23 @@ class Trafaret::Validator
   end
 
   def validate(data)
-    if @blk
-      @blk.call(data)
-    else
-      data # or return Trafaret::Error
-    end
+    data # or return Trafaret::Error
   end
 
   def convert(data)
     data
+  end
+
+  def perform_convert(data)
+    if @converters.blank?
+      convert(data)
+    else
+      @converters.each do |c|
+        data = c.call(data)
+        break if data.is_a? Trafaret::Error
+      end
+      data
+    end
   end
 
   def call(data)
@@ -28,8 +37,12 @@ class Trafaret::Validator
     if block_given?
       yield val
     else
-      convert(val)
+      perform_convert(val)
     end
+  end
+
+  def add(blk)
+    @converters << blk
   end
 
   # ADT

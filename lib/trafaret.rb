@@ -38,7 +38,7 @@ module Trafaret
     end
 
     def proc(*args, &blk)
-      Trafaret::Validator.new *args, &blk
+      Trafaret::Proc.new *args, &blk
     end
 
     def failure(msg)
