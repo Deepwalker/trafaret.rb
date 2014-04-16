@@ -44,6 +44,12 @@ module Trafaret
     end
   end
 
+  class Nil < Validator
+    def validate(data)
+      failure('Value must be nil') unless data.nil?
+    end
+  end
+
   class String < Validator
     def validate(data)
       return failure('Not a String') unless data.is_a? ::String
@@ -87,7 +93,12 @@ module Trafaret
 
   class Array < Validator
     def prepare
-      @cls = Trafaret.get_validator(@options[:validator]).new @options
+      val = Trafaret.get_validator(@options[:validator])
+      if val.is_a? ::Class
+        @cls = Trafaret.get_validator(@options[:validator]).new @options
+      else
+        @cls = val
+      end
     end
 
     def self.[](validator, options = {})

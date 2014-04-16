@@ -30,6 +30,20 @@ describe Trafaret::Base do
   it 'should work' do
     FacebookResponseTrafaret.new.call(raw).should == ({name: "kuku", providers: [{url: "http://ya.ru"}, {url: "http://www.ru"}], dwarf: 'Sniffer'})
   end
+
+  it 'should work with hash' do
+    t = T.construct({
+      kuku: :integer,
+      T.key(:krkr, nil, to_name: :id) => :string,
+      argh: {
+        karma: :integer
+      },
+      arr: [{id: :integer}]
+    })
+    res = t.call({kuku: 123, krkr: 'karma', argh: {karma: 234}, arr: [{id: 123}, {id: 234}]})
+    res[:id].should == 'karma'
+    res[:argh][:karma].should == 234
+  end
 end
 
 describe Trafaret::String do
@@ -101,6 +115,9 @@ describe Trafaret::Key do
     T.key(:name, :string).call({name: 'cow'}).should == [:name, 'cow']
     T.key(:name, :string, default: 'Elephant').call({}).should == [:name, 'Elephant']
     T.key(:name, :string, optional: true).call({}).should == nil
+    # to name test
+    T.key(:name, :string, to_name: :id).call({name: '123'}).should == [:id, '123']
+    T.key(:name, :string, to_name: :id).call({name: 123})[0].should == :name
   end
 end
 
@@ -113,5 +130,13 @@ describe Trafaret::Symbol do
   it 'should fail' do
     T.symbol(:name).call('pame').message.should == 'Not equal'
     T.symbol(:name).call(123).message.should == 'Not a String or a Symbol'
+  end
+end
+
+describe Trafaret::Nil do
+  it 'should check for nil' do
+    n = T::Nil.new
+    n.call(123).message.should == 'Value must be nil'
+    n.call(nil).should == nil
   end
 end

@@ -5,8 +5,12 @@ require 'trafaret/validator'
 require 'trafaret/validators'
 require 'trafaret/numeric'
 require 'trafaret/base'
+require 'trafaret/constructor'
 
 module Trafaret
+  module NoValue
+  end
+
   class << self
     def get_validator(validator)
       if validator.is_a? ::Symbol
@@ -43,6 +47,10 @@ module Trafaret
 
     def failure(msg)
       Trafaret::Error.new msg
+    end
+
+    def construct(from)
+      Trafaret::Constructor.construct_from(from)
     end
 
     alias :f :failure

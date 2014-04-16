@@ -1,51 +1,64 @@
 module Trafaret
   class Key
     def initialize(name, validator, options = {}, &blk)
-      validator = Trafaret.get_validator(validator)
       @name = name
+      @sname = name.to_s
+
+      @optional = options.delete(:optional)
+      @default = options.delete(:default)
+      @to_name = options.delete(:to_name) || name
+      @options = options
+
+      set_validator(validator, options, &blk)
+    end
+
+    def set_validator(validator, options = {}, &blk)
+      validator = Trafaret.get_validator(validator)
       @validator = if validator.is_a?(Class) then validator.new(options) else validator end
       @validator.add(blk) if blk
-      @options = options
-      @optional = options[:optional]
-      @default = options[:default]
-      @to_name = options[:to_name] || name
     end
 
     def get(obj)
-      data = begin
-               obj.send(@name)
-             rescue NameError
-               nil
-             end
-      data ||= begin
-                 obj[@name] || obj[@name.to_s]
-               rescue NoMethodError, TypeError
-                 nil
-               end
-      data ||= @default if @default
-      data
+      # data = obj.send(@name) if data.respond_to? @name
+      if obj.include? @name
+        obj[@name]
+      elsif obj.include? @sname
+        obj[@sname]
+      else
+        NoValue
+      end
     end
 
     def call(data)
       value = get(data)
-      return unless value || !@optional
+      if value == NoValue
+        if @default
+          value = @default
+        elsif @optional
+          return
+        else
+          return [@name, Trafaret::Error.new("#{@name} is required")]
+        end
+      end
       value = @validator.call(value, &@blk)
-      [@to_name, value]
+      if value.is_a? Trafaret::Error
+        [@name, value]
+      else
+        [@to_name, value]
+      end
     end
   end
 
   class Base < Validator
     module ClassMethods
-      attr_accessor :keys, :extractors
+      attr_accessor :keys
       def inherited(base)
         base.keys = (keys || []).dup
-        base.extractors = (extractors || {}).dup
       end
 
       def key(name, validator, options = {}, &blk)
         @keys << Key.new(name, validator, options, &blk)
       end
-
     end
     extend ClassMethods
 
@@ -56,7 +69,12 @@ module Trafaret
       @keys.concat(self.class.keys || [])
     end
 
+    def key(name, validator, options = {}, &blk)
+      @keys << Key.new(name, validator, options, &blk)
+    end
+
     def validate(data)
+      return failure('Not a Hash') unless data.is_a?(::Hash)
       res = []
       fails = []
       @keys.each do |key|
