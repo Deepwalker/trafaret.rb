@@ -12,7 +12,7 @@ module Trafaret
         when Trafaret::Validator
           from
         when ::Proc
-          from
+          Trafaret::Proc.new &from
         else
           raise 'Wrong parameter'
         end

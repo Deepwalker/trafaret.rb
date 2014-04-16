@@ -39,9 +39,10 @@ describe Trafaret::Base do
         karma: :integer
       },
       array: [{id: :integer}],
-      proc_: proc { |d| d }
+      proc_: proc { |d| d },
+      just_trafaret: T.nil
     })
-    res = t.call({kuku: 123, krkr: 'karma', hash: {karma: 234}, array: [{id: 123}, {id: 234}], proc_: 123})
+    res = t.call({kuku: 123, krkr: 'karma', hash: {karma: 234}, array: [{id: 123}, {id: 234}], proc_: 123, just_trafaret: nil})
     res[:id].should == 'karma'
     res[:hash][:karma].should == 234
     res[:proc_].should == 123

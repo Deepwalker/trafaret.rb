@@ -93,12 +93,7 @@ module Trafaret
 
   class Array < Validator
     def prepare
-      val = Trafaret.get_validator(@options[:validator])
-      if val.is_a? ::Class
-        @cls = Trafaret.get_validator(@options[:validator]).new @options
-      else
-        @cls = val
-      end
+      @cls = Trafaret.get_instantiated_validator(@options.delete(:validator), @options)
     end
 
     def self.[](validator, options = {})
