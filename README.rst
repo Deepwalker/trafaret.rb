@@ -26,6 +26,8 @@ You can attach converter to trafaret with ``to``::
 
   T.string(regex: /\A\d+\Z/).to { |match| match.string.to_i }.call('123')
 
+  T.string(regex: /\A\d+\Z/).to(&:string).to(&:to_i).call('123')
+
 Any callable can be used as ``Trafaret`` while it use simple convention. If data ok, you return something, if it wrong
 you must return ``Trafaret::Error`` instance with message. Correct message can be a string or a Hash with simple keys and Errors values::
 

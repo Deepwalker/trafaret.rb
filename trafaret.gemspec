@@ -8,10 +8,10 @@ Gem::Specification.new do |spec|
   spec.version       = Trafaret::VERSION
   spec.authors       = ["Mikhail Krivushin"]
   spec.email         = ["krivushinme@gmail.com"]
-  spec.summary       = %q{Convert data structures. Like a RABL.}
+  spec.summary       = %q{Combinatorial data parser}
   spec.description   = %q{The thing to convert entities from one to other.
                           Idea from Python Trafaret lib in Ruby way.}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/Deepwalker/trafaret.rb"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
