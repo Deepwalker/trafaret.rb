@@ -11,6 +11,8 @@ module Trafaret
           Trafaret.get_validator from
         when Trafaret::Validator
           from
+        when ::Proc
+          from
         else
           raise 'Wrong parameter'
         end

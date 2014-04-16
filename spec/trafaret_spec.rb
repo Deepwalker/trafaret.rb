@@ -35,14 +35,16 @@ describe Trafaret::Base do
     t = T.construct({
       kuku: :integer,
       T.key(:krkr, nil, to_name: :id) => :string,
-      argh: {
+      hash: {
         karma: :integer
       },
-      arr: [{id: :integer}]
+      array: [{id: :integer}],
+      proc_: proc { |d| d }
     })
-    res = t.call({kuku: 123, krkr: 'karma', argh: {karma: 234}, arr: [{id: 123}, {id: 234}]})
+    res = t.call({kuku: 123, krkr: 'karma', hash: {karma: 234}, array: [{id: 123}, {id: 234}], proc_: 123})
     res[:id].should == 'karma'
-    res[:argh][:karma].should == 234
+    res[:hash][:karma].should == 234
+    res[:proc_].should == 123
   end
 end
 

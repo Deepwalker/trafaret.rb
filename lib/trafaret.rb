@@ -14,7 +14,7 @@ module Trafaret
   class << self
     def get_validator(validator)
       if validator.is_a? ::Symbol
-        class_name = validator.to_s.classify
+        class_name = validator.to_s.split('_').collect!{ |w| w.capitalize }.join
         validator = Trafaret.const_get(class_name) rescue nil
         validator ||= Kernel.const_get(class_name)
       else

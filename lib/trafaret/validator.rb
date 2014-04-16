@@ -45,6 +45,11 @@ class Trafaret::Validator
     @converters << blk
   end
 
+  def to (&blk)
+    @converters << blk
+    self
+  end
+
   # ADT
   def |(other)
     Trafaret::Or.new(self, other)
