@@ -8,7 +8,7 @@ module Trafaret
         when ::Array
           from_array(from)
         when ::Symbol
-          Trafaret.get_validator from
+          Trafaret.get_instantiated_validator from
         when Trafaret::Validator
           from
         when ::Proc

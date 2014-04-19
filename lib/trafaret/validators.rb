@@ -5,9 +5,9 @@ module Trafaret
   class ADT < Validator
     attr_reader :validators
 
-    def initialize(*args)
-      args = args.first if args.first.is_a? ::Array
-      @validators = args.map { |v| Trafaret.get_instantiated_validator(v) }
+    def prepare(*args)
+      @args = @args.first if @args.first.is_a? ::Array
+      @validators = @args.map { |v| Trafaret.get_instantiated_validator(v) }
     end
   end
 

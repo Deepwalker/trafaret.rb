@@ -21,6 +21,10 @@ module Trafaret
       return failure('Too small') if @options[:gte] && val < @options[:gte]
       data
     end
+
+    def convert(data)
+      try_convert(data)
+    end
   end
 
   class Integer < Numeric

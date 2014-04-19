@@ -35,3 +35,34 @@ you must return ``Trafaret::Error`` instance with message. Correct message can b
   => #<Trafaret::Error("Not a Bart text!")>
   irb> (T.string & T.proc { |data| data == 'karramba' ? 'Bart' : T.failure('Not a Bart text!')}).call ('karramba')
   => "Bart"
+
+Numeric
+-------
+
+Two trafarets Integer and Float supports common interface. In options this is parameters `lt`, `lte`, `gt`, `gte`.
+
+Example::
+
+  T.integer(gt: 3, lt: 5).call(4) == 4
+  T.float(gt:3, lt: 5).call(4.3) == 4.3
+
+String
+------
+
+Parameters `allow_blank`, `min_length`, `max_length`. And special option `regex`.
+
+Example::
+
+  T.string.call('kuku') == 'kuku'
+  T.string(regex: /\Akuku\z/).call('kuku') == 'kuku'
+
+If you use custom converter block, you will get `Match` instead of `String`, so you can use regex result::
+
+  T.string(regex: /\Ayear=(\d+),month=(\d+),day=(\d+)\z/).to {|m| Date.new(*m.to_a[1..3].map(&:to_i)) }.call('year=2012,month=5,day=4').to_s == '2012-05-04'
+
+Array
+-----
+
+Get one important parameter `validator` that will be applied to every array element::
+
+  T.array(validator: :integer).call(['1','2','3']) == [1,2,3]
