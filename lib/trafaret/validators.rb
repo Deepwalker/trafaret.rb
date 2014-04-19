@@ -153,4 +153,25 @@ module Trafaret
       @blk.call(data)
     end
   end
+
+  class Case < Validator
+    def prepare
+      @whens = []
+      @converters.shift.call(self)
+    end
+
+    def when(trafaret, &blk)
+      @whens << [trafaret, blk]
+    end
+
+    def call(data)
+      @whens.each do |trafaret, blk|
+        val = trafaret.call(data)
+        unless val.is_a?(Trafaret::Error)
+          return blk.call(val)
+        end
+      end
+      failure('Case does not match')
+    end
+  end
 end

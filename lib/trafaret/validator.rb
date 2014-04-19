@@ -50,6 +50,10 @@ class Trafaret::Validator
     self
   end
 
+  def ===(data)
+    !validate(data).is_a?(Trafaret::Error)
+  end
+
   # ADT
   def |(other)
     Trafaret::Or.new(self, other)

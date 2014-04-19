@@ -143,3 +143,35 @@ describe Trafaret::Nil do
     n.call(nil).should == nil
   end
 end
+
+describe Trafaret::Validator do
+  it 'must work with case' do
+    caser = proc do |a|
+      case a
+      when T.integer
+        :int
+      when T.symbol(:k)
+        :symbol
+      else
+        :any
+      end
+    end
+    caser.call(123).should == :int
+    caser.call(:k).should == :symbol
+    caser.call('asd').should == :any
+  end
+end
+
+describe Trafaret::Case do
+  it 'must work' do
+    cs = T.case do |c|
+      c.when(T.integer) { |r| :int }
+      c.when(T.string) { |r| :string }
+      c.when(T.nil) { |r| :nil }
+    end
+    cs.call(123).should == :int
+    cs.call('123').should == :int
+    cs.call('abs').should == :string
+    cs.call(nil).should == :nil
+  end
+end

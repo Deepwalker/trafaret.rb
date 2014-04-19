@@ -66,3 +66,23 @@ Array
 Get one important parameter `validator` that will be applied to every array element::
 
   T.array(validator: :integer).call(['1','2','3']) == [1,2,3]
+
+Case
+----
+
+You can use Ruby case with trafarets, but this have not much sense::
+
+  case 123
+  when T.integer
+    :integer
+  else
+    :any
+  end
+
+And you can use `Trafaret::Case` that puts result of trafaret to when clause::
+
+  cs = T.case do |c|
+    c.when(T.integer) { |r| :int }
+    c.when(T.string) { |r| :string }
+    c.when(T.nil) { |r| :nil }
+  end
