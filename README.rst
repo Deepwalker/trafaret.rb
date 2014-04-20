@@ -86,3 +86,16 @@ And you can use `Trafaret::Case` that puts result of trafaret to when clause::
     c.when(T.string) { |r| :string }
     c.when(T.nil) { |r| :nil }
   end
+
+Tuple
+-----
+
+Tuple is Array that consists not from any number of similar elements, but from exact number of different ones.
+`[1,2,3]` - Array of ints.
+`[1, 'a', nil]` - Tuple.
+
+Example::
+
+  t = T.tuple(:integer, :string, :nil)
+  t.call([1, 'a', nil]) == [1, 'a', nil]
+  t.call([1, 'a', 3]).dump == {2 => 'Value must be nil'} # Error dumped to pure structures

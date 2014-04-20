@@ -161,7 +161,7 @@ module Trafaret
     end
 
     def when(trafaret, &blk)
-      @whens << [trafaret, blk]
+      @whens << [Trafaret::Constructor.construct_from(trafaret), blk]
     end
 
     def call(data)
@@ -172,6 +172,30 @@ module Trafaret
         end
       end
       failure('Case does not match')
+    end
+  end
+
+  class Tuple < Validator
+    def prepare
+      @validators = @args.map { |arg| Trafaret.get_instantiated_validator(arg) }
+      @size = @validators.size
+    end
+
+    def call(data)
+      return failure('Too many elements') if data.size > @size# && !@extra
+      return failure('Not enough elements') if data.size < @size
+      failures = {}
+      result = []
+      data[0..@size].each.with_index do |el, index|
+        val = @validators[index].call(el)
+        result << val
+        failures[index] = val if val.is_a? Trafaret::Error
+      end
+      if failures.empty?
+        result
+      else
+        failure(failures)
+      end
     end
   end
 end

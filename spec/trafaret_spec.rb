@@ -175,3 +175,11 @@ describe Trafaret::Case do
     cs.call(nil).should == :nil
   end
 end
+
+describe Trafaret::Tuple do
+  it 'must work' do
+    t = T.tuple(:integer, :string, :nil)
+    t.call([1, 'a', nil]).should == [1, 'a', nil]
+    t.call([1, 'a', 3]).dump.should == {2 => 'Value must be nil'}
+  end
+end

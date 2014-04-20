@@ -19,11 +19,11 @@ module Trafaret
       return failure('Too big') if @options[:lte] && val > @options[:lte]
       return failure('Too small') if @options[:gt] && val <= @options[:gt]
       return failure('Too small') if @options[:gte] && val < @options[:gte]
-      data
-    end
-
-    def convert(data)
-      try_convert(data)
+      if @converters.empty?
+        val
+      else
+        data
+      end
     end
   end
 
