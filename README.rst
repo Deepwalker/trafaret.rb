@@ -60,6 +60,23 @@ If you use custom converter block, you will get `Match` instead of `String`, so 
 
   T.string(regex: /\Ayear=(\d+),month=(\d+),day=(\d+)\z/).to {|m| Date.new(*m.to_a[1..3].map(&:to_i)) }.call('year=2012,month=5,day=4').to_s == '2012-05-04'
 
+URI
+---
+
+URI parses URI. Parameter `schemes`, by default == ['http', 'https']::
+
+  t = T.uri(schemes: ['ftp'])
+  t.call('ftp://ftp.ueaysuc.co.uk.edu') == 'ftp://ftp.ueaysuc.co.uk.edu'
+
+Possible Errors - 'Invalid scheme', 'Invalid URI'.
+
+Mail
+----
+
+Now just checks simple regexp::
+
+  T.email('kuku@example.com').to { |m| m[:name] } == 'kuku'
+
 Array
 -----
 

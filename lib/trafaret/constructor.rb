@@ -33,8 +33,11 @@ module Trafaret
       end
 
       def from_array(params)
-        raise 'Wrong argument for array construction' if params.size != 1
-        Trafaret::Array.new validator: Trafaret::Constructor.construct_from(params[0])
+        if params.size == 1
+          Trafaret::Array.new validator: Trafaret::Constructor.construct_from(params[0])
+        else params.size > 1
+          Trafaret::Tuple.new(*(params.map { |p| Trafaret::Constructor.construct_from(p) }))
+        end
       end
     end
   end

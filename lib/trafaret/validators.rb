@@ -51,13 +51,17 @@ module Trafaret
   end
 
   class String < Validator
+    def prepare
+      @regex = ::Regexp.compile @options[:regex] if @options[:regex]
+    end
+
     def validate(data)
       return failure('Not a String') unless data.is_a? ::String
       return failure('Should not be blank') if !@options[:allow_blank] && data.empty? 
       return failure('Too short') if @options[:min_length] && data.size < @options[:min_length]
       return failure('Too long') if @options[:max_length] && data.size > @options[:max_length]
-      if @options[:regex]
-        match = @options[:regex].match(data)
+      if @regex
+        match = @regex.match(data)
         return failure('Does not match') unless match
         return match
       end

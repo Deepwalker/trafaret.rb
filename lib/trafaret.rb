@@ -4,6 +4,7 @@ require 'trafaret/errors'
 require 'trafaret/validator'
 require 'trafaret/validators'
 require 'trafaret/numeric'
+require 'trafaret/uri_email'
 require 'trafaret/base'
 require 'trafaret/constructor'
 

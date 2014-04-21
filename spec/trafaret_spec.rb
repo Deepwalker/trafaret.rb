@@ -39,10 +39,11 @@ describe Trafaret::Base do
         karma: :integer
       },
       array: [{id: :integer}],
+      tuple: [:integer, :nil],
       proc_: proc { |d| d },
       just_trafaret: T.nil
     })
-    res = t.call({kuku: 123, krkr: 'karma', hash: {karma: 234}, array: [{id: 123}, {id: 234}], proc_: 123, just_trafaret: nil})
+    res = t.call({kuku: 123, krkr: 'karma', hash: {karma: 234}, array: [{id: 123}, {id: 234}], proc_: 123, just_trafaret: nil, tuple: [123, nil]})
     res[:id].should == 'karma'
     res[:hash][:karma].should == 234
     res[:proc_].should == 123
@@ -163,7 +164,7 @@ describe Trafaret::Validator do
 end
 
 describe Trafaret::Case do
-  it 'must work' do
+  it 'must case options' do
     cs = T.case do |c|
       c.when(T.integer) { |r| :int }
       c.when(T.string) { |r| :string }
@@ -177,9 +178,23 @@ describe Trafaret::Case do
 end
 
 describe Trafaret::Tuple do
-  it 'must work' do
+  it 'must match tuple' do
     t = T.tuple(:integer, :string, :nil)
     t.call([1, 'a', nil]).should == [1, 'a', nil]
     t.call([1, 'a', 3]).dump.should == {2 => 'Value must be nil'}
+  end
+end
+
+describe Trafaret::URI do
+  it 'must match uri' do
+    t = T.uri(schemes: ['http', 'https'])
+    t.call('http://ya.ru:80').should == 'http://ya.ru'
+  end
+end
+
+describe Trafaret::Email do
+  it 'must parse email' do
+    e = T.email.to { |m| m[:name] }
+    e.call('kuku@gmail.com').should == 'kuku'
   end
 end
