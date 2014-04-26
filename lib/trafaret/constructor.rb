@@ -23,7 +23,7 @@ module Trafaret
         params.each do |k, v|
           v = Trafaret::Constructor.construct_from v
           if k.is_a? ::Symbol
-            keys << Key.new(k, v)
+            keys << Key.new(k, validator: v)
           elsif k.is_a? Trafaret::Key
             k.set_validator(v)
             keys << k

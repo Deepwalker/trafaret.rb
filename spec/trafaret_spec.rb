@@ -7,7 +7,7 @@ class FacebookResponseTrafaret < Trafaret::Base
   key :name, T.string(min_length: 2), optional: true
   key :oa, T.mapping(T.string,
     T.mapping(T.string,
-      T.base(keys: [T.key(:url, T.string)])
+      T.base(keys: [T.key(:url, validator: T.string)])
     )
   ), to_name: :providers do |data| # so we have response that matches our assumptions, then we can convert it
     data.flat_map { |p_n, accs| accs.map { |uuid, data| data } }
@@ -34,7 +34,7 @@ describe Trafaret::Base do
   it 'should work with hash' do
     t = T.construct({
       kuku: :integer,
-      T.key(:krkr, nil, to_name: :id) => :string,
+      T.key(:krkr, to_name: :id) => :string,
       hash: {
         karma: :integer
       },
@@ -116,12 +116,12 @@ end
 
 describe Trafaret::Key do
   it 'should extract and check value' do
-    T.key(:name, :string).call({name: 'cow'}).should == [:name, 'cow']
-    T.key(:name, :string, default: 'Elephant').call({}).should == [:name, 'Elephant']
-    T.key(:name, :string, optional: true).call({}).should == nil
+    T.key(:name, validator: :string).call({name: 'cow'}).should == [:name, 'cow']
+    T.key(:name, validator: :string, default: 'Elephant').call({}).should == [:name, 'Elephant']
+    T.key(:name, validator: :string, optional: true).call({}).should == nil
     # to name test
-    T.key(:name, :string, to_name: :id).call({name: '123'}).should == [:id, '123']
-    T.key(:name, :string, to_name: :id).call({name: 123})[0].should == :name
+    T.key(:name, validator: :string, to_name: :id).call({name: '123'}).should == [:id, '123']
+    T.key(:name, validator: :string, to_name: :id).call({name: 123})[0].should == :name
   end
 end
 
@@ -196,5 +196,15 @@ describe Trafaret::Email do
   it 'must parse email' do
     e = T.email.to { |m| m[:name] }
     e.call('kuku@gmail.com').should == 'kuku'
+  end
+end
+
+describe Trafaret::Forward do
+  it 'should provide recursive' do
+    fwd = Trafaret.forward
+    v = T.construct(T.key(:child, optional: true) => fwd, payload: :string)
+    fwd.provide v
+    res = v.call({child: {child: {payload: 'kuku'}, payload: '123'}, payload: '321'})
+    res[:child][:child][:payload].should == 'kuku'
   end
 end

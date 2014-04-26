@@ -44,6 +44,19 @@ module Trafaret
     end
   end
 
+  class Forward < Validator
+    attr_accessor :validator
+
+    def provide(validator)
+      @validator = validator
+    end
+
+    def validate(data)
+      raise 'Validator is not provided' unless validator
+      validator.validate(data)
+    end
+  end
+
   class Nil < Validator
     def validate(data)
       failure('Value must be nil') unless data.nil?

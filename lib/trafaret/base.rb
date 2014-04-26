@@ -1,15 +1,16 @@
 module Trafaret
   class Key
-    def initialize(name, validator, options = {}, &blk)
+    def initialize(name, options = {}, &blk)
       @name = name
       @sname = name.to_s
 
       @optional = options.delete(:optional)
       @default = options.delete(:default)
       @to_name = options.delete(:to_name) || name
+      validator = options.delete(:validator)
       @options = options
 
-      set_validator(validator, options, &blk)
+      set_validator(validator, options, &blk) if validator
     end
 
     def set_validator(validator, options = {}, &blk)
@@ -57,7 +58,7 @@ module Trafaret
       end
 
       def key(name, validator, options = {}, &blk)
-        @keys << Key.new(name, validator, options, &blk)
+        @keys << Key.new(name, options.merge(validator: validator), &blk)
       end
     end
     extend ClassMethods
@@ -70,7 +71,7 @@ module Trafaret
     end
 
     def key(name, validator, options = {}, &blk)
-      @keys << Key.new(name, validator, options, &blk)
+      @keys << Key.new(name, validator, options.merge(validator: validator), &blk)
     end
 
     def validate(data)
