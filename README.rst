@@ -39,7 +39,7 @@ you must return ``Trafaret::Error`` instance with message. Correct message can b
 Numeric
 -------
 
-Two trafarets Integer and Float supports common interface. In options this is parameters `lt`, `lte`, `gt`, `gte`.
+Two trafarets ``Integer`` and ``Float`` supports common interface. In options this is parameters ``lt``, ``lte``, ``gt``, ``gte``.
 
 Example::
 
@@ -49,21 +49,21 @@ Example::
 String
 ------
 
-Parameters `allow_blank`, `min_length`, `max_length`. And special option `regex`.
+Parameters ``allow_blank``, ``min_length``, ``max_length``. And special option ``regex``.
 
 Example::
 
   T.string.call('kuku') == 'kuku'
   T.string(regex: /\Akuku\z/).call('kuku') == 'kuku'
 
-If you use custom converter block, you will get `Match` instead of `String`, so you can use regex result::
+If you use custom converter block, you will get ``Match`` instead of ``String``, so you can use regex result::
 
   T.string(regex: /\Ayear=(\d+),month=(\d+),day=(\d+)\z/).to {|m| Date.new(*m.to_a[1..3].map(&:to_i)) }.call('year=2012,month=5,day=4').to_s == '2012-05-04'
 
 URI
 ---
 
-URI parses URI. Parameter `schemes`, by default == ['http', 'https']::
+URI parses URI. Parameter ``schemes``, by default == ['http', 'https']::
 
   t = T.uri(schemes: ['ftp'])
   t.call('ftp://ftp.ueaysuc.co.uk.edu') == 'ftp://ftp.ueaysuc.co.uk.edu'
@@ -80,7 +80,7 @@ Now just checks simple regexp::
 Array
 -----
 
-Get one important parameter `validator` that will be applied to every array element::
+Get one important parameter ``validator`` that will be applied to every array element::
 
   T.array(validator: :integer).call(['1','2','3']) == [1,2,3]
 
@@ -96,7 +96,7 @@ You can use Ruby case with trafarets, but this have not much sense::
     :any
   end
 
-And you can use `Trafaret::Case` that puts result of trafaret to when clause::
+And you can use ``Trafaret::Case`` that puts result of trafaret to when clause::
 
   cs = T.case do |c|
     c.when(T.integer) { |r| :int }
@@ -108,8 +108,8 @@ Tuple
 -----
 
 Tuple is Array that consists not from any number of similar elements, but from exact number of different ones.
-`[1,2,3]` - Array of ints.
-`[1, 'a', nil]` - Tuple.
+``[1,2,3]`` - Array of ints.
+``[1, 'a', nil]`` - Tuple.
 
 Example::
 
