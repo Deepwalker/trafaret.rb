@@ -13,7 +13,7 @@ module Trafaret
     def dump
       case @message
       when ::Hash
-        Hash[@message.map { |k, v| [k, v.dump] }]
+        ::Hash[@message.map { |k, v| [k, v.dump] }]
       when ::Array
         @message.map &:dump
       else

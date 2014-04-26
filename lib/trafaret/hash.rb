@@ -50,7 +50,7 @@ module Trafaret
     end
   end
 
-  class Base < Validator
+  class Hash < Validator
     module ClassMethods
       attr_accessor :keys
       def inherited(base)
@@ -88,9 +88,9 @@ module Trafaret
         end
       end
       if fails.blank?
-        Hash[res]
+        ::Hash[res]
       else
-        failure(Hash[fails])
+        failure(::Hash[fails])
       end
     end
   end

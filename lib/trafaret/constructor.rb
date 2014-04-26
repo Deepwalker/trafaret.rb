@@ -29,7 +29,7 @@ module Trafaret
             keys << k
           end
         end
-        Trafaret::Base.new keys: keys
+        Trafaret::Hash.new keys: keys
       end
 
       def from_array(params)

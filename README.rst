@@ -116,3 +116,17 @@ Example::
   t = T.tuple(:integer, :string, :nil)
   t.call([1, 'a', nil]) == [1, 'a', nil]
   t.call([1, 'a', 3]).dump == {2 => 'Value must be nil'} # Error dumped to pure structures
+
+Hash
+----
+
+Hashes work in pair with ``Key``'s::
+
+  T::Hash.new(keys: [T.key(:field_name, validator: T.string)])
+
+Is not too appeal, but Keys are powerful and we have sugar::
+
+  T.construct(
+    kuku: :integer,
+    T.key(:opt_field, optional: true) => T.integer
+  )

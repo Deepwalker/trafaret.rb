@@ -2,7 +2,7 @@ class Trafaret::Validator
   attr_accessor :converters, :options
 
   def initialize(*args, &blk)
-    @options = (args.pop if args.last.is_a? Hash) || {}
+    @options = (args.pop if args.last.is_a? ::Hash) || {}
     @args = args
     @converters = []
     @converters << blk if blk

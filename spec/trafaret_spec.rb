@@ -3,11 +3,11 @@ require 'trafaret'
 
 T = Trafaret
 
-class FacebookResponseTrafaret < Trafaret::Base
+class FacebookResponseTrafaret < Trafaret::Hash
   key :name, T.string(min_length: 2), optional: true
   key :oa, T.mapping(T.string,
     T.mapping(T.string,
-      T.base(keys: [T.key(:url, validator: T.string)])
+      T[:hash, keys: [T.key(:url, validator: T.string)]]
     )
   ), to_name: :providers do |data| # so we have response that matches our assumptions, then we can convert it
     data.flat_map { |p_n, accs| accs.map { |uuid, data| data } }
@@ -16,7 +16,7 @@ class FacebookResponseTrafaret < Trafaret::Base
   key :optional_key, :string, optional: true
 end
 
-describe Trafaret::Base do
+describe Trafaret::Hash do
   let :raw do
     {'name' => 'kuku',
      'oa' => {

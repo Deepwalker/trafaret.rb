@@ -153,9 +153,9 @@ module Trafaret
         end
       end
       if fails.blank?
-        Hash[pairs]
+        ::Hash[pairs]
       else
-        failure(Hash[fails])
+        failure(::Hash[fails])
       end
     end
   end
