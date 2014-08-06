@@ -48,6 +48,14 @@ describe Trafaret::Hash do
     res[:hash][:karma].should == 234
     res[:proc_].should == 123
   end
+
+  it 'should work with optional keys' do
+    t = T.construct({
+      T.key(:abd, optional: true) => :string
+    })
+    t.call({}).should == {}
+    t.call({'abd' => 'abc'}).should == {abd: 'abc'}
+  end
 end
 
 describe Trafaret::String do
