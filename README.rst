@@ -1,7 +1,12 @@
 Trafaret
 ========
 
-Trafaret is lib for data parsing.
+Trafaret is lib for data parsing. It is suitable to use in place of strong parameters,
+POST and GET data parsing, JSON matchers in spec and more more. Use it anywhere for
+check and convert data. I'm serious - not only checks is important, you often need
+to do something with data based on it type, due fact that trafaret supports ADT like
+data description.
+
 
 You can want this first::
 
