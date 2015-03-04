@@ -1,18 +1,18 @@
 Trafaret
 ========
 
-Trafaret is lib for data parsing. It is suitable to use in place of strong parameters,
-POST and GET data parsing, JSON matchers in spec and more more. Use it anywhere for
-check and convert data. I'm serious - not only checks is important, you often need
-to do something with data based on it type, due fact that trafaret supports ADT like
+Trafaret is a library for data parsing. Use it anywhere to check and convert data. 
+
+Trafaret is suitable to use in place of strong parameters, POST and GET data parsing, JSON matchers in spec, and more. 
+  
+Checking data is important, and you often need to do something with data based on it type, due fact that Trafaret supports ADT like
 data description.
 
-
-You can want this first::
+You may want this first::
 
   T = Trafaret
 
-Small example for one of ways to construct Trafaret::
+Example of a way to construct Trafaret::
 
   T.construct({
     id: :integer,
@@ -21,20 +21,20 @@ Small example for one of ways to construct Trafaret::
     proc_: proc { |a| a == 3 ? a : T.failure('Not a 3') }
   })
 
-Trafarets supports ``|`` and ``&`` operations::
+Trafaret supports ``|`` and ``&`` operations::
 
   (T.symbol(:t) | T.symbol(:a)).call(:t) == :t
 
   (T.string.to(&:to_i) & T.integer).call('123') == 123
 
-You can attach converter to trafaret with ``to``::
+You can attach converter to Trafaret with ``to``::
 
   T.string(regex: /\A\d+\Z/).to { |match| match.string.to_i }.call('123')
 
   T.string(regex: /\A\d+\Z/).to(&:string).to(&:to_i).call('123')
 
-Any callable can be used as ``Trafaret`` while it use simple convention. If data ok, you return something, if it wrong
-you must return ``Trafaret::Error`` instance with message. Correct message can be a string or a Hash with simple keys and Errors values::
+Any callable can be used as ``Trafaret`` while it use simple convention. If the data are correct, then you return something; if the data are incorrect, then 
+you return ``Trafaret::Error`` instance and an error message. A correct message can be a string or a Hash with simple keys and Errors values::
 
   irb> (T.string & T.proc { |data| data == 'karramba' ? 'Bart' : T.failure('Not a Bart text!')}).call ('ku')
   => #<Trafaret::Error("Not a Bart text!")>
@@ -44,7 +44,7 @@ you must return ``Trafaret::Error`` instance with message. Correct message can b
 Numeric
 -------
 
-Two trafarets ``Integer`` and ``Float`` supports common interface. In options this is parameters ``lt``, ``lte``, ``gt``, ``gte``.
+Trafaret ``Integer`` and ``Float`` use a common interface. In the options, the parameters are ``lt``, ``lte``, ``gt``, ``gte``.
 
 Example::
 
@@ -59,11 +59,11 @@ Parameters ``allow_blank``, ``min_length``, ``max_length``. And special option `
 Example::
 
   T.string.call('kuku') == 'kuku'
-  T.string(regex: /\Akuku\z/).call('kuku') == 'kuku'
+  T.string(regex: /\Akuku\Z/).call('kuku') == 'kuku'
 
-If you use custom converter block, you will get ``Match`` instead of ``String``, so you can use regex result::
+If you use a custom converter block, you will get ``Match`` instead of ``String``, so you can use regex result::
 
-  T.string(regex: /\Ayear=(\d+),month=(\d+),day=(\d+)\z/).to {|m| Date.new(*m.to_a[1..3].map(&:to_i)) }.call('year=2012,month=5,day=4').to_s == '2012-05-04'
+  T.string(regex: /\Ayear=(\d+),month=(\d+),day=(\d+)\Z/).to {|m| Date.new(*m.to_a[1..3].map(&:to_i)) }.call('year=2012,month=5,day=4').to_s == '2012-05-04'
 
 URI
 ---
@@ -129,7 +129,7 @@ Hashes work in pair with ``Key``'s::
 
   T::Hash.new(keys: [T.key(:field_name, validator: T.string)])
 
-Is not too appeal, but Keys are powerful and we have sugar::
+Keys are powerful and we have syntax sugar::
 
   T.construct(
     kuku: :integer,
